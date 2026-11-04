@@ -30,8 +30,18 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files. The example documents every variable, so it is deliberately
+# re-included after the blanket ignore.
 .env*
+!.env.example
+
+# Local PGlite database. Real data, never committed.
+/.data/
+
+# Browser-driven test output
+/.playwright-mcp/
+/test-results/
+*.png
 
 # vercel
 .vercel

@@ -1,26 +1,285 @@
 @import "tailwindcss";
 
+/*
+ * SecurePulse design tokens.
+ *
+ * Direction: a clinical lab report, not a hacker terminal. Every competitor in
+ * this space ships a dark security dashboard built for an analyst. Our buyer is
+ * a web designer or a small business owner, so the product reads as a precise,
+ * legible document: warm paper ground, hairline rules, monospace for anything
+ * that is literal machine output, and exactly one strong accent.
+ *
+ * Dark mode is a SELECTED palette, not an inversion. Each value is chosen
+ * against the dark surface: the accent is lifted (a #2d4cff cobalt is close to
+ * unreadable on a near-black panel) and every status colour is re-stepped so it
+ * keeps its contrast without turning neon.
+ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --paper: #f7f7f5;
+  --surface: #ffffff;
+  --ink: #14171a;
+  --slate: #5a6472;
+  --rule: #e2e3de;
+  --rule-strong: #c9cbc4;
+  --hover: #ececea;
+  --muted: #98a0ac;
+
+  --signal: #2d4cff;
+  --signal-hover: #2340e6;
+  --signal-ink: #1c33b8;
+  --signal-soft: #eaedff;
+  --ink-hover: #2a2f36;
+
+  --pass: #1f6f4a;
+  --pass-soft: #e8f2ec;
+  --caution: #9a6400;
+  --caution-soft: #faf0dc;
+  --alert: #b32d09;
+  --alert-soft: #fbeae5;
+
+  --shade: rgba(20, 23, 26, 0.25);
+  color-scheme: light;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Explicit choice wins over the system preference, both ways. */
+:root[data-theme='dark'],
+:root:not([data-theme='light']) {
+  color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme='light']) {
+    --paper: #121417;
+    --surface: #191c20;
+    --ink: #e8eaed;
+    --slate: #9aa3ae;
+    --rule: #262a2f;
+    --rule-strong: #3a3f46;
+    --hover: #21252a;
+    --muted: #767f8a;
+
+    --signal: #7d90ff;
+    --signal-hover: #94a4ff;
+    --signal-ink: #aab6ff;
+    --signal-soft: #1b2140;
+    --ink-hover: #d4d8dd;
+
+    --pass: #4ba97a;
+    --pass-soft: #13291f;
+    --caution: #d19a2e;
+    --caution-soft: #2b2213;
+    --alert: #e8735c;
+    --alert-soft: #2e1813;
+
+    --shade: rgba(0, 0, 0, 0.55);
+    color-scheme: dark;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+:root[data-theme='dark'] {
+  --paper: #121417;
+  --surface: #191c20;
+  --ink: #e8eaed;
+  --slate: #9aa3ae;
+  --rule: #262a2f;
+  --rule-strong: #3a3f46;
+  --hover: #21252a;
+  --muted: #767f8a;
+
+  --signal: #7d90ff;
+  --signal-hover: #94a4ff;
+  --signal-ink: #aab6ff;
+  --signal-soft: #1b2140;
+  --ink-hover: #d4d8dd;
+
+  --pass: #4ba97a;
+  --pass-soft: #13291f;
+  --caution: #d19a2e;
+  --caution-soft: #2b2213;
+  --alert: #e8735c;
+  --alert-soft: #2e1813;
+
+  --shade: rgba(0, 0, 0, 0.55);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-slate: var(--slate);
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
+  --color-hover: var(--hover);
+  --color-muted: var(--muted);
+
+  --color-signal: var(--signal);
+  --color-signal-hover: var(--signal-hover);
+  --color-signal-ink: var(--signal-ink);
+  --color-ink-hover: var(--ink-hover);
+  --color-signal-soft: var(--signal-soft);
+
+  --color-pass: var(--pass);
+  --color-pass-soft: var(--pass-soft);
+  --color-caution: var(--caution);
+  --color-caution-soft: var(--caution-soft);
+  --color-alert: var(--alert);
+  --color-alert-soft: var(--alert-soft);
+
+  --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-public-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", monospace;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+  }
+
+  /* The display face is only ever used large and tight. */
+  .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.032em;
+  }
+
+  ::selection {
+    background-color: var(--signal);
+    color: var(--surface);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--signal);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+/*
+ * The readout: the page's signature element.
+ *
+ * A response-header listing rendered the way you would actually see it, with
+ * one addition that is the entire product thesis - headers that are ABSENT but
+ * expected are drawn as ghost rows. Security posture is mostly about what is
+ * missing from a response, so the design shows absence rather than describing
+ * it.
+ */
+.readout-row {
+  display: grid;
+  grid-template-columns: 1.25rem minmax(0, 1fr);
+  gap: 0.625rem;
+  padding: 0.3125rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  border-left: 2px solid transparent;
+}
+
+.readout-row--present {
+  color: var(--ink);
+  border-left-color: var(--pass);
+}
+
+.readout-row--missing {
+  color: var(--muted);
+  border-left-color: var(--rule-strong);
+  border-top: 1px dashed var(--rule);
+  border-bottom: 1px dashed var(--rule);
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent,
+    transparent 7px,
+    color-mix(in srgb, var(--muted) 9%, transparent) 7px,
+    color-mix(in srgb, var(--muted) 9%, transparent) 8px
+  );
+}
+
+.readout-row--weak {
+  color: var(--caution);
+  border-left-color: var(--caution);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .readout-row {
+    animation: readout-in 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+@keyframes readout-in {
+  from {
+    opacity: 0;
+    transform: translateX(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Hairline grid behind the hero. Structure, not decoration: it echoes the
+   ruled paper of a report form. */
+.ruled {
+  background-image: linear-gradient(var(--rule) 1px, transparent 1px);
+  background-size: 100% 2rem;
+}
+
+.prose-report h2 {
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  letter-spacing: -0.02em;
+  margin: 1.5rem 0 0.5rem;
+}
+.prose-report h2:first-child {
+  margin-top: 0;
+}
+.prose-report p {
+  margin: 0 0 0.75rem;
+  line-height: 1.65;
+}
+.prose-report ol,
+.prose-report ul {
+  margin: 0 0 0.75rem;
+  padding-left: 1.25rem;
+  line-height: 1.65;
+}
+.prose-report ol {
+  list-style: decimal;
+}
+.prose-report ul {
+  list-style: disc;
+}
+.prose-report li {
+  margin-bottom: 0.375rem;
+}
+.prose-report strong {
+  font-weight: 650;
+}
+.prose-report code {
+  font-family: var(--font-mono);
+  font-size: 0.8125em;
+  background: var(--paper);
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+}
+
+/* The printed client report is always on white, whatever the screen theme. */
+@media print {
+  :root {
+    --paper: #ffffff;
+    --surface: #ffffff;
+    --ink: #14171a;
+    --slate: #4a5462;
+    --rule: #d8d9d4;
+    --rule-strong: #b4b6b0;
+    color-scheme: light;
+  }
+  .no-print {
+    display: none !important;
+  }
 }
